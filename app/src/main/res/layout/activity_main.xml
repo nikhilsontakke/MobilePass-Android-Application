@@ -135,7 +135,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Tap to Autheticate Access to Door"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:gravity="center_horizontal"
+                    android:text="Tap NFC Sensor on Door to Authenticate Access to Door"
                     android:textColor="@android:color/black"
                     android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -143,6 +146,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
+                    android:contentDescription="NFC Icon"
                     android:layout_width="122dp"
                     android:layout_height="59dp"
                     android:layout_marginTop="10dp"
