@@ -5,8 +5,6 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final Button loginbutton = findViewById(R.id.login);
 
         //Initialise NfcAdapter
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -31,8 +28,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
         //Create a PendingIntent object so the Android system can populate it with the details of the tag when it is scanned.
-        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, this.getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE);
-
+        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, this.getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_MUTABLE);
     }
 
     @Override
@@ -48,10 +44,6 @@ public class MainActivity extends AppCompatActivity {
         if (nfcAdapter != null) {
             nfcAdapter.disableForegroundDispatch(this);
         }
-    }
-
-    private void AutheticateAccess(){
-
     }
 
     @Override
