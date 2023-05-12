@@ -1,6 +1,7 @@
 package com.example.mobilepass;
 import android.app.PendingIntent;
 import android.content.Intent;
+//import android.hardware.biometrics.BiometricManager;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -8,11 +9,12 @@ import android.util.Log;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import java.util.concurrent.Executor;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
     NfcAdapter nfcAdapter;
     PendingIntent pendingIntent;
 
@@ -78,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
                 .setDescription("Use Biometrics for Authentication").setNegativeButtonText("Cancel").build();
 
         biometricPrompt.authenticate(promptInfo);
+//        BiometricManager biometricManager = BiometricManager.from(this);
+//        biometricManager.getAuthenticatorId();
+
     }
 
     private String ReadNFCTagIntent(Intent intent) {
