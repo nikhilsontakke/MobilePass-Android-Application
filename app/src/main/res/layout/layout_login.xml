@@ -27,7 +27,7 @@
             style="@style/parent"
             android:layout_marginTop="@dimen/loginViewsMargin">
             <EditText
-                android:id="@+id/editTextEmail"
+                android:id="@+id/username"
                 style="@style/modifiedEditText"
                 android:inputType="textEmailAddress"
                 android:maxLines="1"
@@ -39,7 +39,7 @@
             style="@style/parent"
             android:layout_marginTop="@dimen/loginViewsMargin">
             <EditText
-                android:id="@+id/editTextPassword"
+                android:id="@+id/password"
                 style="@style/modifiedEditText"
                 android:hint="@string/login_password_hint"
                 android:maxLines="1"

@@ -1,27 +1,46 @@
 package com.example.mobilepass;
 import android.app.PendingIntent;
 import android.content.Intent;
-//import android.hardware.biometrics.BiometricManager;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
+import java.util.HashMap;
 import java.util.concurrent.Executor;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
     NfcAdapter nfcAdapter;
     PendingIntent pendingIntent;
+    TextView empNameView, empPositionView, empDepartmentView, empIdView;
+    HashMap<String, String> empDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        empNameView = findViewById(R.id.empName);
+        empPositionView = findViewById(R.id.empPosition);
+        empDepartmentView = findViewById(R.id.empDepartment);
+        empIdView = findViewById(R.id.empId);
+
+        Intent intent = getIntent();
+        empDetails = (HashMap<String, String>) intent.getSerializableExtra("employeeDetails");
+        empNameView.setText(empDetails.get("name"));
+        empPositionView.setText(empDetails.get("position"));
+        empDepartmentView.setText(empDetails.get("department"));
+//        empIdView.setText("Employee ID - "+ empDetails.get("id"));
 
         //Initialise NfcAdapter
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -53,8 +72,6 @@ public class MainActivity extends AppCompatActivity  {
         super.onNewIntent(intent);
         setIntent(intent);
         String NfcCardUid = ReadNFCTagIntent(intent);
-
-        //Creating Biometric Prompt
         Executor executor = ContextCompat.getMainExecutor(this);
         final BiometricPrompt biometricPrompt = new BiometricPrompt(MainActivity.this, executor, new BiometricPrompt.AuthenticationCallback() {
             @Override
@@ -65,7 +82,31 @@ public class MainActivity extends AppCompatActivity  {
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                Toast.makeText(getApplicationContext(), "Access Granted - Card UID = "+NfcCardUid, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Access Granted - Card UID = "+NfcCardUid, Toast.LENGTH_SHORT).show();
+                String BASE_URL = "http://192.168.1.96:8080/";
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(BASE_URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+                ApiService apiService = retrofit.create(ApiService.class);
+                Call<ResponseBody> call = apiService.validateAccess(NfcCardUid,empDetails.get("username"));
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            ResponseBody responseBody = response.body();
+                            Toast.makeText(MainActivity.this, "Access Granted", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Handle error response
+                            Toast.makeText(MainActivity.this, "Error: " + response.code(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        // Handle network failure
+                        Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
             @Override
             public void onAuthenticationFailed() {
@@ -80,9 +121,6 @@ public class MainActivity extends AppCompatActivity  {
                 .setDescription("Use Biometrics for Authentication").setNegativeButtonText("Cancel").build();
 
         biometricPrompt.authenticate(promptInfo);
-//        BiometricManager biometricManager = BiometricManager.from(this);
-//        biometricManager.getAuthenticatorId();
-
     }
 
     private String ReadNFCTagIntent(Intent intent) {
